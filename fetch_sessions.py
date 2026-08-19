@@ -1,4 +1,7 @@
 import os
+from dotenv import load_dotenv
+load_dotenv()
+
 from curl_cffi import requests
 from datetime import datetime, timedelta
 import sys
@@ -18,6 +21,8 @@ def send_telegram_message(message):
         print("Notificação enviada com sucesso pro Telegram!")
     except Exception as e:
         print(f"Erro ao enviar Telegram: {e}")
+        if hasattr(response, 'text'):
+            print(f"Detalhes do erro do Telegram: {response.text}")
 
 LAST_AVAILABLE_DATE = datetime(2026,8,19)
 
@@ -49,7 +54,9 @@ def get_target_dates(current_date):
     """
     if current_date.month == LAST_AVAILABLE_DATE.month and current_date.day <= LAST_AVAILABLE_DATE.day:
         return [
-            datetime(current_date.year, 8, 19).strftime('%Y-%m-%d'),
+            datetime(current_date.year, 8, 20).strftime('%Y-%m-%d'),
+            datetime(current_date.year, 8, 21).strftime('%Y-%m-%d'),
+            datetime(current_date.year, 8, 22).strftime('%Y-%m-%d'),
         ]
     else:
         return [
@@ -123,7 +130,7 @@ def main():
                     default_sector = session.get("defaultSector")
                     id = session.get("id")
                     seats_url = f"https://api.ingresso.com/v1/sessions/{id}/sections/{default_sector}/seats"
-                    msg = f" - [{session_type_desc}] Horário: {time} | Sala: {room} | Preço: R${price:.2f}"
+                    msg = f" - [{session_type_desc}] Horário: {time} | Sala: {room} | Preço: R${price:.2f} \n Link: https://checkout.ingresso.com/assentos?sessionId={id}&partnership=home"
                     print(msg)
                     seats = get_seats(seats_url, qtd_seats)
                     print(seats)
